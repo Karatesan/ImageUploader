@@ -1,6 +1,7 @@
 package com.karatesan.ImageUploader.service;
 
 import com.karatesan.ImageUploader.dto.ImageResponseDto;
+import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
 import com.karatesan.ImageUploader.exception.ImageNotFoundException;
 import com.karatesan.ImageUploader.utility.ImageUploadUtility;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -100,7 +102,7 @@ class ImageUploadServiceTest {
     @Test
     public void testSaveImage() throws IOException {
 
-        ImageResponseDto image = imageUploadService.saveImage(multipartFile);
+        ImageResponseDtoLocation image = imageUploadService.saveImage(multipartFile);
 
         File savedFile = new File(tempDir + "/1/" + image.fileName());
         assertTrue(savedFile.exists());
@@ -124,17 +126,59 @@ class ImageUploadServiceTest {
 
     @Test
     public void testGetImageAsBytesRetrievesImageWhenExists() throws IOException {
+//        Path groupDir = tempDir.resolve("1");
+//        Files.createDirectories(groupDir);
+//
+//        String imageName = "testImage.png";
+//        Path imagePath = groupDir.resolve(imageName);
+//
+//        byte[] expectedContent = "image-data".getBytes();
+//        Files.write(imagePath, expectedContent);
+//
+//        byte[] actualContent = imageUploadService.getImageAsBytes(imageName, 1L);
+        String imageName = "testImage.jpg";
+        Path uploadPath = tempDir.resolve("1");
+        Files.createDirectories(uploadPath);
+        byte[] expectedImageBytes = Files.readAllBytes(Path.of(testImagePath));
+        Files.write(uploadPath.resolve(imageName),expectedImageBytes);
 
-        ImageResponseDto image = imageUploadService.saveImage(multipartFile);
-        System.out.println(ImageUploadUtility.getGroupId(image.location()));
-        byte[] expectedImage = Files.readAllBytes(Path.of(image.location()).resolve(image.fileName()));
-        byte[] actualImage = imageUploadService.getImageAsBytes(image.fileName(),ImageUploadUtility.getGroupId(image.location()));
+        byte[] actualContent = imageUploadService.getImageAsBytes(imageName, 1L);
 
+
+        assertArrayEquals(expectedImageBytes, actualContent, "The image content should match.");
+    }
+
+    @Test
+    public void testGetImageAsBytesThrowsImageNotFoundExceptionWhenThereIsNoImageInProvidedPath(){
+
+        String fakeImageName = "no-image-here.jpg";
+        long fakeGroupId = 20L;
+
+        assertThrows(ImageNotFoundException.class, ()-> imageUploadService.getImageAsBytes(fakeImageName,fakeGroupId));
+    }
+
+    @Test
+    public void testGetImageAsBase64StringRetrievesConvertedImage() throws IOException {
+        String imageName = "testImage.jpg";
+        Path uploadPath = tempDir.resolve("1");
+        Files.createDirectories(uploadPath);
+        byte[] expectedImageBytes = Files.readAllBytes(Path.of(testImagePath));
+        String base64EncodedFile = Base64.getEncoder().encodeToString(expectedImageBytes);
+        Files.write(uploadPath.resolve(imageName),expectedImageBytes);
+
+        String imageAsBase64String = imageUploadService.getImageAsBase64String(imageName, 1L);
+
+        Path p = Path.of("src/test/resources/base.txt");
+        Path p2 = Path.of("src/test/resources/bytes.txt");
+        Files.write(p,imageAsBase64String.getBytes());
+        Files.write(p2,expectedImageBytes);
+
+
+        assertEquals(base64EncodedFile,imageAsBase64String);
 
     }
 
     //====================================================================================================
-
 
     private MultipartFile createMultiPartFile(File file) throws IOException {
         try (FileInputStream input = new FileInputStream(file)) {

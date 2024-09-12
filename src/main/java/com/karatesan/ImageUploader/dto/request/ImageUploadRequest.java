@@ -1,4 +1,4 @@
-package com.karatesan.ImageUploader.dto;
+package com.karatesan.ImageUploader.dto.request;
 
 import org.springframework.web.multipart.MultipartFile;
 
