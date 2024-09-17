@@ -1,9 +1,6 @@
 package com.karatesan.ImageUploader.service;
 
 import com.karatesan.ImageUploader.dto.request.ImageRequestDtoGetImage;
-import com.karatesan.ImageUploader.dto.response.ImageResponse;
-import com.karatesan.ImageUploader.dto.response.ImageResponseDtoBase64;
-import com.karatesan.ImageUploader.dto.response.ImageResponseDtoBytes;
 import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
 import com.karatesan.ImageUploader.exception.ImageNotFoundException;
 import com.karatesan.ImageUploader.exception.ImageReadException;
@@ -19,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -69,7 +65,6 @@ public class ImageUploadService {
     public String getImageAsBase64String(String imageName, long groupId) {
         byte[] imageAsBytes = this.getImageAsBytes(imageName, groupId);
         return Base64.getEncoder().encodeToString(imageAsBytes);
-
     }
 
 //TODO as stream

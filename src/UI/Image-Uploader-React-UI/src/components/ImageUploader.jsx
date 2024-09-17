@@ -4,7 +4,8 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import ImageGallery from './ImageGallery';
 import Button from '@mui/material/Button';
-import axios from 'axios'
+
+import { getImage } from '../service/FetchImagesService';
 
 const ImageUploader = () => {
 
@@ -12,19 +13,17 @@ const ImageUploader = () => {
 
 
 useEffect(()=>{
-    
-    const getData = async () =>{ 
-      const response = await axios.post("http://localhost:8080/upload/getImage",{
-                fileName: "feface7e-93a7-4957-8dab-7cc3c81b1acd_pexels-shvetsa-5711901.jpg",
-                groupId: 5,
-                dataType: "BYTES" 
-        }
-    )
-    console.log(response.data)
-    setData(response)
+  const fetchData = async () => { 
+    try{
+      const image = await  getImage("BASE64",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+      const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+      setData([image,image2]);
+    } catch(ex) {
+      console.log(ex)
     }
+  }
 
-    getData();
+  fetchData();
 
 
 },[])
@@ -34,6 +33,7 @@ useEffect(()=>{
 if(!data){return <div>loading...</div>
 }
 
+console.log(data)
 
   return (
      <React.Fragment>
@@ -42,7 +42,8 @@ if(!data){return <div>loading...</div>
         <Box sx={{ bgcolor: '#cfe8fc', height: '100vh'}} >
 
             <Button variant='contained'>Upload Image</Button>
-            <img style={{width:"399px"}} src={`data:image/jpeg;base64,${data.data.imageData}`} alt="From Base64 String" />
+            <img style={{width:"399px"}} src={`data:image/jpeg;base64,${data[0]}`} alt="From Base64 String" />
+            <img style={{width:"399px"}} src={data[1]} alt="From bytes[]" />
             <ImageGallery itemData={itemData} />
             </Box>
       </Container>
