@@ -5,47 +5,81 @@ import Container from '@mui/material/Container';
 import ImageGallery from './ImageGallery';
 import Button from '@mui/material/Button';
 
-import { getImage } from '../service/FetchImagesService';
+import { getImage, uploadFile } from '../service/FetchImagesService';
 
 const ImageUploader = () => {
 
     const [data,setData] = useState()
+    const [images,setImages] = useState([])
 
 
 useEffect(()=>{
   const fetchData = async () => { 
     try{
       const image = await  getImage("BASE64",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
-      const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
-      setData([image,image2]);
+      //const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+      const image3 = await getImage("RESOURCE",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+    
+
+      setData([image,image3]);
+
     } catch(ex) {
       console.log(ex)
     }
   }
-
   fetchData();
 
 
 },[])
 
 
+const handleAddFile = (event)=>{
 
-if(!data){return <div>loading...</div>
+  const file = event.target.files[0]
+  setImages([...images, 
+    
+    {
+      img: file,
+      title:file.title
+    }
+    ])
 }
 
-console.log(data)
+// const handleFileUpload = async () =>{
+//   const response = await uploadFile(images[0]);
+//   console.log(response)
+
+// }
+
+const handleFileUpload = async () => {
+  if (images.length > 0) {
+    try {
+      const response = await uploadFile(images[0].img);
+      console.log(response);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  } else {
+    console.error('No images to upload');
+  }
+};
+
+console.log(images)
+if(!data){return <div>loading...</div>
+}
 
   return (
      <React.Fragment>
       <CssBaseline />
       <Container fixed>
         <Box sx={{ bgcolor: '#cfe8fc', height: '100vh'}} >
-
-            <Button variant='contained'>Upload Image</Button>
+            <input type='file' onChange={handleAddFile} accept="image/jpeg, image/png, image/gif, image/webp, image/svg+xml" />
+            <Button variant='contained' onClick={handleFileUpload}>Upload Image</Button>
             <img style={{width:"399px"}} src={`data:image/jpeg;base64,${data[0]}`} alt="From Base64 String" />
-            <img style={{width:"399px"}} src={data[1]} alt="From bytes[]" />
-            <ImageGallery itemData={itemData} />
-            </Box>
+            { images[0]?<img style={{width:"399px"}} src={images[0].img} alt="From bytes[]" /> : <p>Nie ma</p> }
+            <img style={{width:"399px"}} src={data[1]} alt="From resource stream" />
+            <ImageGallery itemData={images} />
+          </Box>
       </Container>
     </React.Fragment>
   )

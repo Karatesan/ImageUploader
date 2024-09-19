@@ -4,7 +4,8 @@ import org.springframework.http.MediaType;
 
 public enum FileResponseDataType {
     BYTES(MediaType.IMAGE_JPEG),
-    BASE64(MediaType.TEXT_PLAIN);
+    BASE64(MediaType.TEXT_PLAIN),
+    RESOURCE(MediaType.IMAGE_JPEG);
 
     private final MediaType mediaType;
 

@@ -1,30 +1,25 @@
 package com.karatesan.ImageUploader.service;
 
-import com.karatesan.ImageUploader.dto.request.ImageRequestDtoGetImage;
 import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
-import com.karatesan.ImageUploader.exception.ImageNotFoundException;
-import com.karatesan.ImageUploader.exception.ImageReadException;
-import com.karatesan.ImageUploader.exception.UnsupportedDataTypeException;
+import com.karatesan.ImageUploader.service.interfaces.FileServiceConfig;
 import com.karatesan.ImageUploader.utility.ImageUploadUtility;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Base64;
+
 import java.util.UUID;
 
 @Setter
 @Service
 public class ImageUploadService {
 
-    @Value("${upload.dir}")
-    private String uploadDirectory;
+    @Autowired
+    private FileServiceConfig fileServiceConfig;
 
     public ImageResponseDtoLocation saveImage(MultipartFile image, long groupId) throws IOException {
 
@@ -33,7 +28,7 @@ public class ImageUploadService {
         }
 
         String uniqueFileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-        Path uploadPath = Path.of(uploadDirectory).resolve(String.valueOf(groupId));
+        Path uploadPath = Path.of(fileServiceConfig.getUploadDirectory()).resolve(String.valueOf(groupId));
         Path filePath = uploadPath.resolve(uniqueFileName);
 
         if (!Files.exists(uploadPath)) {
@@ -45,42 +40,10 @@ public class ImageUploadService {
     }
 
     public ImageResponseDtoLocation saveImage(MultipartFile image) throws IOException {
-        return saveImage(image, ImageUploadUtility.getNextGroupNumber(uploadDirectory));
+        return saveImage(image, ImageUploadUtility.getNextGroupNumber(fileServiceConfig.getUploadDirectory()));
     }
 
-    //======================================================================================
 
-    public byte[] getImageAsBytes(String imageName, long groupId) {
-        Path imagePath = Path.of(uploadDirectory).resolve(String.valueOf(groupId)).resolve(imageName);
-        File image = imagePath.toFile();
-        if (!image.exists())
-            throw new ImageNotFoundException(imageName);
-        try {
-            return Files.readAllBytes(imagePath);
-        } catch (IOException e) {
-            throw new ImageReadException("Error reading image: " + imageName, e);
-        }
-    }
-
-    public String getImageAsBase64String(String imageName, long groupId) {
-        byte[] imageAsBytes = this.getImageAsBytes(imageName, groupId);
-        return Base64.getEncoder().encodeToString(imageAsBytes);
-    }
-
-//TODO as stream
-    public Object getImage(ImageRequestDtoGetImage imageRequest) {
-        String fileName = imageRequest.fileName();
-        long group = imageRequest.groupId();
-        switch (imageRequest.dataType()) {
-            case BYTES -> {
-                return getImageAsBytes(fileName, group);
-            }
-            case BASE64 -> {
-                return getImageAsBase64String(fileName, group);
-            }
-            default -> throw new UnsupportedDataTypeException("Unsupported data type: " + imageRequest.dataType());
-        }
-    }
 }
 
 //public ImageResponse getImage(ImageRequestDtoGetImage imageRequest) {
