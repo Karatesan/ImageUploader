@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import axios from 'axios'
 
 
@@ -26,7 +27,7 @@ export const uploadFile = async (image) =>{
         //     formData.append("images",image)
         // })
         formData.append("image",image)
-        console.log(formData)
+
     const response = await axios.post(BASE_URL + "upload", formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -34,6 +35,7 @@ export const uploadFile = async (image) =>{
     return response.data;
   }
   catch(exception){
+    
     throw exception
   }
 }

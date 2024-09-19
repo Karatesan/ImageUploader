@@ -35,8 +35,7 @@ public class ImageUploadService {
             Files.createDirectories(uploadPath);
         }
         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return new ImageResponseDtoLocation(uniqueFileName, uploadPath.toString(), image.getContentType());
+        return new ImageResponseDtoLocation(uniqueFileName,  Long.valueOf(groupId).toString(), image.getContentType());
     }
 
     public ImageResponseDtoLocation saveImage(MultipartFile image) throws IOException {

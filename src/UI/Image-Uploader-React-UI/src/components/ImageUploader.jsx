@@ -4,44 +4,47 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import ImageGallery from './ImageGallery';
 import Button from '@mui/material/Button';
+import LinearProgress from '@mui/material/LinearProgress';
 
 import { getImage, uploadFile } from '../service/FetchImagesService';
 
 const ImageUploader = () => {
 
-    const [data,setData] = useState()
+    const [imagesToUpload,setImagesToUpload] = useState([])
+    const [uploadedImagesData, setUploadedImagesData] = useState(null)
     const [images,setImages] = useState([])
 
 
 useEffect(()=>{
   const fetchData = async () => { 
+    if(uploadedImagesData){
     try{
-      const image = await  getImage("BASE64",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
-      //const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
-      const image3 = await getImage("RESOURCE",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+     
+       const image = await  getImage("BASE64",uploadedImagesData.location,uploadedImagesData.fileName)
+      // const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+      // const image3 = await getImage("RESOURCE",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
     
-
-      setData([image,image3]);
+       setImages([...images, 
+        {
+          img: image,
+          title:uploadedImagesData.fileName
+        }
+       ]);
+       setUploadedImagesData(null)
 
     } catch(ex) {
       console.log(ex)
     }
   }
+}
   fetchData();
-
-
-},[])
-
+},[uploadedImagesData])
 
 const handleAddFile = (event)=>{
 
   const file = event.target.files[0]
-  setImages([...images, 
-    
-    {
-      img: file,
-      title:file.title
-    }
+  setImagesToUpload([...imagesToUpload, file
+
     ])
 }
 
@@ -52,11 +55,15 @@ const handleAddFile = (event)=>{
 // }
 
 const handleFileUpload = async () => {
-  if (images.length > 0) {
+  if (imagesToUpload.length > 0) {
     try {
-      const response = await uploadFile(images[0].img);
-      console.log(response);
+      const response = await uploadFile(imagesToUpload[0]);
+      setImagesToUpload([])
+      setUploadedImagesData(response)
+
+      
     } catch (error) {
+      
       console.error('Error uploading file:', error);
     }
   } else {
@@ -64,9 +71,30 @@ const handleFileUpload = async () => {
   }
 };
 
-console.log(images)
-if(!data){return <div>loading...</div>
-}
+
+// if(!data){
+//   return    ( 
+//     <Box
+//       sx={{
+//         display: 'flex',
+//         flexDirection: 'column',
+//         justifyContent: 'center',
+//         gap:'20px',
+//         alignItems: 'center',
+//         height: '100vh',  // Full viewport height
+//       }}
+//   >
+//     <h2>Loading ...</h2>
+//       <Box sx={{
+//         width: '400px'
+//       }}>
+//        <LinearProgress color="success" />
+       
+//       </Box>
+        
+//     </Box>
+//     )
+// }
 
   return (
      <React.Fragment>
@@ -75,9 +103,8 @@ if(!data){return <div>loading...</div>
         <Box sx={{ bgcolor: '#cfe8fc', height: '100vh'}} >
             <input type='file' onChange={handleAddFile} accept="image/jpeg, image/png, image/gif, image/webp, image/svg+xml" />
             <Button variant='contained' onClick={handleFileUpload}>Upload Image</Button>
-            <img style={{width:"399px"}} src={`data:image/jpeg;base64,${data[0]}`} alt="From Base64 String" />
-            { images[0]?<img style={{width:"399px"}} src={images[0].img} alt="From bytes[]" /> : <p>Nie ma</p> }
-            <img style={{width:"399px"}} src={data[1]} alt="From resource stream" />
+            {/* {uploadedImagesData.length>0 && <img style={{width:"399px"}} src={`data:image/jpeg;base64,${images[0]}`} alt="From Base64 String" />} */}
+            {imagesToUpload.length>0 && <img style={{width:"399px"}} src={URL.createObjectURL(imagesToUpload[0])} alt="tymczasowy" />}
             <ImageGallery itemData={images} />
           </Box>
       </Container>
@@ -86,6 +113,20 @@ if(!data){return <div>loading...</div>
 }
 
 export default ImageUploader
+
+
+
+
+{/* <Container fixed>
+<Box sx={{ bgcolor: '#cfe8fc', height: '100vh'}} >
+    <input type='file' onChange={handleAddFile} accept="image/jpeg, image/png, image/gif, image/webp, image/svg+xml" />
+    <Button variant='contained' onClick={handleFileUpload}>Upload Image</Button>
+    <img style={{width:"399px"}} src={`data:image/jpeg;base64,${data[0]}`} alt="From Base64 String" />
+    { images[0]?<img style={{width:"399px"}} src={images[0].img} alt="From bytes[]" /> : <p>Nie ma</p> }
+    <img style={{width:"399px"}} src={data[1]} alt="From resource stream" />
+    <ImageGallery itemData={images} />
+  </Box>
+</Container> */}
 
 const itemData = [
     {

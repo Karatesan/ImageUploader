@@ -34,6 +34,7 @@ public class ImageDownloadController {
     @GetMapping("/images/{groupId}/{fileName}")
     public ResponseEntity<InputStreamResource> getImageResource(@PathVariable("groupId") Long groupId,
                                                                 @PathVariable("fileName")String fileName) throws FileNotFoundException {
+        System.out.println(ImageUploadUtility.getContentType(fileName));
         InputStreamResource imageResourceStream = imageDownloadService.getImageResourceStream(groupId, fileName);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,"inline; filename=\"" + ImageUploadUtility.getOriginalImageName(fileName) + "\"")

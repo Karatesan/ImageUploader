@@ -1,9 +1,12 @@
 package com.karatesan.ImageUploader.controller;
 
 import com.karatesan.ImageUploader.dto.response.ImageResponse;
+import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
 import com.karatesan.ImageUploader.service.ImageDownloadService;
 import com.karatesan.ImageUploader.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -18,12 +21,16 @@ public class ImageUploadController {
     private ImageUploadService imageUploadService;
     @Autowired
     private ImageDownloadService imageDownloadService;
+
 //   public ImageResponse uploadImage(@RequestParam List<MultipartFile> images){
     //TODOMa zwrocic link do resourca
     @PostMapping
-    public ImageResponse uploadImage(@RequestParam("image") MultipartFile image){
+    public ResponseEntity<ImageResponse> uploadImage(@RequestParam("image") MultipartFile image){
         try {
-            return imageUploadService.saveImage(image);
+            ImageResponseDtoLocation imageResponseDtoLocation = imageUploadService.saveImage(image);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(imageResponseDtoLocation);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

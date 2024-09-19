@@ -1,6 +1,7 @@
 package com.karatesan.ImageUploader.utility;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,6 +48,12 @@ public class ImageUploadUtility {
 
     public static String getImageExtension(String filename){
         return getLastFromSplitString(getOriginalImageName(filename),"\\.");
+    }
+
+    public static MediaType getContentType(String filename){
+
+        //String extension = getImageExtension(filename);
+        return MediaTypeFactory.getMediaType(filename).get();
     }
 
 }

@@ -1,0 +1,1 @@
+Problem byl gdy nie mialem forlderu images, wywalalo error 500 podczas proby uploadowania
