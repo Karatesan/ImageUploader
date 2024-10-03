@@ -19,11 +19,14 @@ useEffect(()=>{
   const fetchData = async () => { 
     if(uploadedImagesData){
     try{
-     
-       const image = await  getImage("BASE64",uploadedImagesData.location,uploadedImagesData.fileName)
+     //jak pobieram jako base64 to wyswietlam tak:  src={`data:image/jpeg;base64,${item.img}`}
+     //jak pobieram jako link to wyswietlam link:  src={item.img}
+
+       //const image = await  getImage("BASE64",uploadedImagesData.location,uploadedImagesData.fileName)
       // const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
-      // const image3 = await getImage("RESOURCE",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
-    
+
+       const image = await getImage("RESOURCE",uploadedImagesData.location,uploadedImagesData.fileName)
+     
        setImages([...images, 
         {
           img: image,
@@ -59,9 +62,7 @@ const handleFileUpload = async () => {
     try {
       const response = await uploadFile(imagesToUpload[0]);
       setImagesToUpload([])
-      setUploadedImagesData(response)
-
-      
+      setUploadedImagesData(response)  
     } catch (error) {
       
       console.error('Error uploading file:', error);
