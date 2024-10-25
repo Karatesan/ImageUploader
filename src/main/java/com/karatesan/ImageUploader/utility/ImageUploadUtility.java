@@ -51,8 +51,6 @@ public class ImageUploadUtility {
     }
 
     public static MediaType getContentType(String filename){
-
-        //String extension = getImageExtension(filename);
         return MediaTypeFactory.getMediaType(filename).get();
     }
 
