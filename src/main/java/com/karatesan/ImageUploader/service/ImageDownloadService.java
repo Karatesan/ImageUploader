@@ -20,24 +20,12 @@ import java.util.Base64;
 @Service
 public class ImageDownloadService {
 
+
+    private final FileServiceConfig fileServiceConfig;
+
     @Autowired
-    private FileServiceConfig fileServiceConfig;
-
-    public byte[] getImageAsBytes(String imageName, long groupId) {
-        Path imagePath = Path.of(fileServiceConfig.getUploadDirectory()).resolve(String.valueOf(groupId)).resolve(imageName);
-        File image = imagePath.toFile();
-        if (!image.exists())
-            throw new ImageNotFoundException(imageName);
-        try {
-            return Files.readAllBytes(imagePath);
-        } catch (IOException e) {
-            throw new ImageReadException("Error reading image: " + imageName, e);
-        }
-    }
-
-    public String getImageAsBase64String(String imageName, long groupId) {
-        byte[] imageAsBytes = this.getImageAsBytes(imageName, groupId);
-        return Base64.getEncoder().encodeToString(imageAsBytes);
+    public ImageDownloadService(FileServiceConfig fileServiceConfig) {
+        this.fileServiceConfig = fileServiceConfig;
     }
 
     //TODO as stream
@@ -69,5 +57,22 @@ public class ImageDownloadService {
         }
         FileInputStream fileInputStream = new FileInputStream(image);
         return new InputStreamResource(fileInputStream);
+    }
+
+    public byte[] getImageAsBytes(String imageName, long groupId) {
+        Path imagePath = Path.of(fileServiceConfig.getUploadDirectory()).resolve(String.valueOf(groupId)).resolve(imageName);
+        File image = imagePath.toFile();
+        if (!image.exists())
+            throw new ImageNotFoundException(imageName);
+        try {
+            return Files.readAllBytes(imagePath);
+        } catch (IOException e) {
+            throw new ImageReadException("Error reading image: " + imageName, e);
+        }
+    }
+
+    public String getImageAsBase64String(String imageName, long groupId) {
+        byte[] imageAsBytes = this.getImageAsBytes(imageName, groupId);
+        return Base64.getEncoder().encodeToString(imageAsBytes);
     }
 }

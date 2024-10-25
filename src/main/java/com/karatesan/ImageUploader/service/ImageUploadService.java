@@ -18,8 +18,13 @@ import java.util.UUID;
 @Service
 public class ImageUploadService {
 
-    @Autowired
+
     private FileServiceConfig fileServiceConfig;
+
+    @Autowired
+    public ImageUploadService(FileServiceConfig fileServiceConfig) {
+        this.fileServiceConfig = fileServiceConfig;
+    }
 
     public ImageResponseDtoLocation saveImage(MultipartFile image, long groupId) throws IOException {
 

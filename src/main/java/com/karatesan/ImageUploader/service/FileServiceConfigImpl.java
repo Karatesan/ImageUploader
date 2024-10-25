@@ -2,6 +2,7 @@ package com.karatesan.ImageUploader.service;
 
 import com.karatesan.ImageUploader.service.interfaces.FileServiceConfig;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
