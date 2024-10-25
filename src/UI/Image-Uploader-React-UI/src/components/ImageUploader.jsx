@@ -26,7 +26,7 @@ useEffect(()=>{
       // const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
 
        const image = await getImage("RESOURCE",uploadedImagesData.location,uploadedImagesData.fileName)
-     
+      console.log(image)
        setImages([...images, 
         {
           img: image,
