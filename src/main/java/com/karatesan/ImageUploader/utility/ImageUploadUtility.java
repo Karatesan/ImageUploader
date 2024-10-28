@@ -1,15 +1,23 @@
 package com.karatesan.ImageUploader.utility;
 
+import com.karatesan.ImageUploader.exception.MalformedFileException;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class ImageUploadUtility {
+
+    private final static List<String> supportedContentTypes = List.of("image/jpeg","image/jpg","image/webp","image/png");
 
     public static long getNextGroupNumber(String uploadDirectory) throws IOException {
         try (Stream<Path> paths = Files.list(Paths.get(uploadDirectory))) {
@@ -52,6 +60,44 @@ public class ImageUploadUtility {
 
     public static MediaType getContentType(String filename){
         return MediaTypeFactory.getMediaType(filename).get();
+    }
+
+    public static boolean isImageValid(MultipartFile image){
+        return supportedContentTypes.contains(image.getContentType()) &&
+               // arePropertiesValid(image) &&
+                isMagicNumbersValid(image);
+    }
+
+    public static boolean arePropertiesValid(MultipartFile file){
+        try (InputStream inputStream = file.getInputStream()) {
+            BufferedImage image = ImageIO.read(inputStream);
+            return image != null && image.getWidth() > 0 && image.getHeight() > 0;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static boolean isMagicNumbersValid(MultipartFile file){
+
+        try(InputStream inputStream = file.getInputStream()){
+            byte[] header = new byte[8];
+            inputStream.read(header);
+            String fileSignature = bytesToHex(header);
+            return fileSignature.startsWith("FFD8FF") || // JPEG
+                    fileSignature.startsWith("89504E47") || // PNG
+                    fileSignature.startsWith("52494646");   // WebP
+
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            hexString.append(String.format("%02X", b));
+        }
+        return hexString.toString();
     }
 
 }

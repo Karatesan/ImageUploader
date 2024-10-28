@@ -2,10 +2,14 @@ package com.karatesan.ImageUploader.controller;
 
 import com.karatesan.ImageUploader.dto.response.ImageResponse;
 import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
+import com.karatesan.ImageUploader.exception.MalformedFileException;
+import com.karatesan.ImageUploader.exception.UnsupportedDataTypeException;
 import com.karatesan.ImageUploader.service.ImageDownloadService;
 import com.karatesan.ImageUploader.service.ImageUploadService;
+import com.karatesan.ImageUploader.utility.ImageUploadUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +30,10 @@ public class ImageUploadController {
     //TODOMa zwrocic link do resourca
     @PostMapping
     public ResponseEntity<ImageResponse> uploadImage(@RequestParam("image") MultipartFile image){
+
+        if (!ImageUploadUtility.isImageValid(image))
+            throw new MalformedFileException("Unsupported or malformed file.");
+
         try {
             ImageResponseDtoLocation imageResponseDtoLocation = imageUploadService.saveImage(image);
             return ResponseEntity

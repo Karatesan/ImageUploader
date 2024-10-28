@@ -1,6 +1,8 @@
 package com.karatesan.ImageUploader.exception.controller;
 
 import com.karatesan.ImageUploader.exception.ImageNotFoundException;
+import com.karatesan.ImageUploader.exception.MalformedFileException;
+import com.karatesan.ImageUploader.exception.UnsupportedDataTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -23,6 +25,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ErrorResponse> handleIOException(IOException exception){
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage()+"cos sie zjebalo");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(UnsupportedDataTypeException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedDataTypeException(UnsupportedDataTypeException ex){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+    @ExceptionHandler(MalformedFileException.class)
+    public ResponseEntity<ErrorResponse> handleMalformedFileException(MalformedFileException ex){
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
