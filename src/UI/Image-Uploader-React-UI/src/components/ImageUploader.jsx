@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 
 import { getImage, uploadFile } from "../service/FetchImagesService";
+import NavBar from "./NavBar";
 
 const ImageUploader = () => {
   const [imagesToUpload, setImagesToUpload] = useState([]);
@@ -28,7 +29,7 @@ const ImageUploader = () => {
             uploadedImagesData.location,
             uploadedImagesData.fileName
           );
-          console.log(image);
+
           setImages([
             ...images,
             {
@@ -48,6 +49,7 @@ const ImageUploader = () => {
   const handleAddFile = (event) => {
     const file = event.target.files[0];
     setImagesToUpload([...imagesToUpload, file]);
+    console.log("dasd");
   };
 
   // const handleFileUpload = async () =>{
@@ -70,64 +72,27 @@ const ImageUploader = () => {
     }
   };
 
-  // if(!data){
-  //   return    (
-  //     <Box
-  //       sx={{
-  //         display: 'flex',
-  //         flexDirection: 'column',
-  //         justifyContent: 'center',
-  //         gap:'20px',
-  //         alignItems: 'center',
-  //         height: '100vh',  // Full viewport height
-  //       }}
-  //   >
-  //     <h2>Loading ...</h2>
-  //       <Box sx={{
-  //         width: '400px'
-  //       }}>
-  //        <LinearProgress color="success" />
-
-  //       </Box>
-
-  //     </Box>
-  //     )
-  // }
-
-  const displayImageToUpload = () => {
-    //
-
-    if (imagesToUpload.length > 0)
-      return (
-        <img
-          style={{ width: "399px" }}
-          src={URL.createObjectURL(imagesToUpload[0])}
-          alt="tymczasowy"
-        />
-      );
-  };
-
   return (
     <React.Fragment>
       <CssBaseline />
       <Container fixed>
+        <NavBar
+          handleAddFile={handleAddFile}
+          handleFileUpload={handleFileUpload}
+        />
         <Box sx={{ bgcolor: "#cfe8fc", height: "100vh" }}>
-          <input
-            type="file"
-            onChange={handleAddFile}
-            // accept="image/jpeg, image/png, image/webp"
-          />
-          <Button variant="contained" onClick={handleFileUpload}>
-            Upload Image
-          </Button>
-          {/* {uploadedImagesData.length>0 && <img style={{width:"399px"}} src={`data:image/jpeg;base64,${images[0]}`} alt="From Base64 String" />} */}
-          {imagesToUpload.length > 0 && (
-            <img
-              style={{ width: "399px" }}
-              src={URL.createObjectURL(imagesToUpload[0])}
-              alt="tymczasowy"
-            />
-          )}
+          {imagesToUpload.length > 0 &&
+            imagesToUpload.map((image, index) => {
+             return (
+             <img
+                key={index}
+                style={{ width: "399px" }}
+                src={URL.createObjectURL(image)}
+                alt="tymczasowy"
+              />
+             )
+             
+            })}
           <ImageGallery itemData={images} />
         </Box>
       </Container>
@@ -149,3 +114,28 @@ export default ImageUploader;
   </Box>
 </Container> */
 }
+
+// if(!data){
+//   return    (
+//     <Box
+//       sx={{
+//         display: 'flex',
+//         flexDirection: 'column',
+//         justifyContent: 'center',
+//         gap:'20px',
+//         alignItems: 'center',
+//         height: '100vh',  // Full viewport height
+//       }}
+//   >
+//     <h2>Loading ...</h2>
+//       <Box sx={{
+//         width: '400px'
+//       }}>
+//        <LinearProgress color="success" />
+
+//       </Box>
+
+//     </Box>
+//     )
+// }
+//{uploadedImagesData.length>0 && <img style={{width:"399px"}} src={`data:image/jpeg;base64,${images[0]}`} alt="From Base64 String" />}
