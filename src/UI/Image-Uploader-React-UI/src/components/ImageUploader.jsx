@@ -6,64 +6,74 @@ import ImageGallery from "./ImageGallery";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import { getImage, uploadFile } from "../service/FetchImagesService";
+import {
+  getImage,
+  uploadFiles,
+  getAllImagesFromGroup,
+} from "../service/FetchImagesService";
 import NavBar from "./NavBar";
 
 const ImageUploader = () => {
   const [imagesToUpload, setImagesToUpload] = useState([]);
-  const [uploadedImagesData, setUploadedImagesData] = useState(null);
+  const [uploadedImagesData, setUploadedImagesData] = useState([]);
+  const [errors,setErrors] = useState([])
   const [images, setImages] = useState([]);
+  const [groups, setGroups] = useState([])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (uploadedImagesData) {
-        try {
-          //jak pobieram jako base64 to wyswietlam tak:  src={`data:image/jpeg;base64,${item.img}`}
-          //jak pobieram jako link to wyswietlam link:  src={item.img}
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (uploadedImagesData) {
+  //       try {
+  //         //jak pobieram jako base64 to wyswietlam tak:  src={`data:image/jpeg;base64,${item.img}`}
+  //         //jak pobieram jako link to wyswietlam link:  src={item.img}
 
-          //const image = await  getImage("BASE64",uploadedImagesData.location,uploadedImagesData.fileName)
-          // const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
+  //         //const image = await  getImage("BASE64",uploadedImagesData.location,uploadedImagesData.fileName)
+  //         // const image2 = await getImage("BYTES",1,"50b27e68-75fc-4740-b142-4c0a47ea4560_pexels-shvetsa-5711901.jpg")
 
-          const image = await getImage(
-            "RESOURCE",
-            uploadedImagesData.location,
-            uploadedImagesData.fileName
-          );
+  //         const images = await getAllImagesFromGroup(
+  //           uploadedImagesData.location
+  //         );
 
-          setImages([
-            ...images,
-            {
-              img: image,
-              title: uploadedImagesData.fileName,
-            },
-          ]);
-          setUploadedImagesData(null);
-        } catch (ex) {
-          console.log(ex);
-        }
-      }
-    };
-    fetchData();
-  }, [uploadedImagesData]);
+  //         const formattedImages = images.map(image=>{
+  //             return
+  //         })
+
+  //         setImages([
+
+  //           {
+  //             img: image,
+  //             title: uploadedImagesData.fileName,
+  //           },
+  //         ]);
+  //         setUploadedImagesData(null);
+  //       } catch (ex) {
+  //         console.log(ex);
+  //       }
+  //     }
+  //   };
+  //   fetchData();
+  // }, [uploadedImagesData]);
 
   const handleAddFile = (event) => {
-    const file = event.target.files[0];
-    setImagesToUpload([...imagesToUpload, file]);
-    console.log("dasd");
+    const files = event.target.files;
+    setImagesToUpload([...imagesToUpload, ...files]);
   };
 
-  // const handleFileUpload = async () =>{
-  //   const response = await uploadFile(images[0]);
-  //   console.log(response)
 
-  // }
 
-  const handleFileUpload = async () => {
+  const handleFileUpload = async (galleryName) => {
     if (imagesToUpload.length > 0) {
       try {
-        const response = await uploadFile(imagesToUpload[0]);
+        const response = await uploadFiles(imagesToUpload, galleryName);
         setImagesToUpload([]);
-        setUploadedImagesData(response);
+        console.log(response)
+        setUploadedImagesData([
+          ...uploadedImagesData,
+          ...response.uploadedImages,
+        ]);
+        if(response.unsavedImages){
+          setErrors([...response.unsavedImages])
+        }
       } catch (error) {
         console.error("Error uploading file:", error);
       }
@@ -79,21 +89,23 @@ const ImageUploader = () => {
         <NavBar
           handleAddFile={handleAddFile}
           handleFileUpload={handleFileUpload}
+          groups={groups}
+          setGroups={setGroups}
+          canUpload = { imagesToUpload.length>0 }
         />
         <Box sx={{ bgcolor: "#cfe8fc", height: "100vh" }}>
           {imagesToUpload.length > 0 &&
             imagesToUpload.map((image, index) => {
-             return (
-             <img
-                key={index}
-                style={{ width: "399px" }}
-                src={URL.createObjectURL(image)}
-                alt="tymczasowy"
-              />
-             )
-             
+              return (
+                <img
+                  key={index}
+                  style={{ width: "399px" }}
+                  src={URL.createObjectURL(image)}
+                  alt="tymczasowy"
+                />
+              );
             })}
-          <ImageGallery itemData={images} />
+          <ImageGallery itemData={uploadedImagesData} />
         </Box>
       </Container>
     </React.Fragment>

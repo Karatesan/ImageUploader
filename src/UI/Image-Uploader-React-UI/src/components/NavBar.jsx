@@ -10,7 +10,9 @@ import Input from '@mui/material/Input';
 import { TextField } from '@mui/material';
 import UploadForm from './UploadForm';
 
-export default function NavBar({handleAddFile, handleFileUpload}) {
+export default function NavBar({handleAddFile, handleFileUpload, groups, setGroups, canUpload}) {
+
+
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -28,7 +30,7 @@ export default function NavBar({handleAddFile, handleFileUpload}) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Image Uploader
           </Typography>
-            <UploadForm handleFileUpload={handleFileUpload} handleAddFile={handleAddFile} />
+          <UploadForm handleFileUpload={handleFileUpload} handleAddFile={handleAddFile} canUpload={canUpload} />
         </Toolbar>
       </AppBar>
     </Box>

@@ -1,9 +1,8 @@
 package com.karatesan.ImageUploader.service;
 
-import com.karatesan.ImageUploader.dto.ImageResponseDto;
 import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
 import com.karatesan.ImageUploader.exception.ImageNotFoundException;
-import com.karatesan.ImageUploader.utility.ImageUploadUtility;
+import com.karatesan.ImageUploader.utility.ImageUtility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +40,7 @@ class ImageUploadServiceTest {
     @Test
     public void testGetNextGroupNumberReturns1WhenImagesDirectoryIsEmpty() throws IOException {
 
-        long nextGroupNumber = ImageUploadUtility.getNextGroupNumber(tempDir.toString());
+        long nextGroupNumber = ImageUtility.getNextGroupNumber(tempDir.toString());
 
         assertEquals(1L, nextGroupNumber);
     }
@@ -51,7 +50,7 @@ class ImageUploadServiceTest {
 
         Files.createDirectory(tempDir.resolve("1"));
 
-        long nextGroupNumber = ImageUploadUtility.getNextGroupNumber(tempDir.toString());
+        long nextGroupNumber = ImageUtility.getNextGroupNumber(tempDir.toString());
 
         assertEquals(2L, nextGroupNumber);
     }
@@ -63,7 +62,7 @@ class ImageUploadServiceTest {
         Files.createDirectory(tempDir.resolve("2"));
         Files.createDirectory(tempDir.resolve("asdasd"));
 
-        long nextGroupNumber = ImageUploadUtility.getNextGroupNumber(tempDir.toString());
+        long nextGroupNumber = ImageUtility.getNextGroupNumber(tempDir.toString());
 
         assertEquals(3L, nextGroupNumber);
     }
@@ -75,26 +74,26 @@ class ImageUploadServiceTest {
         String uploadedImageName = "1312-3123-4235-5345_original-file-name.jpg";
         String originalFileName = "original-file-name.jpg";
 
-        assertEquals(originalFileName, ImageUploadUtility.getOriginalImageName(uploadedImageName));
+        assertEquals(originalFileName, ImageUtility.getOriginalImageName(uploadedImageName));
     }
 
     @Test
     public void testGetOriginalImageNameThrowsIllegalArgumentExceptionWhenProvidedWithEmptyString() {
         String uploadedImageName = "";
-        assertThrows(IllegalArgumentException.class, () -> ImageUploadUtility.getOriginalImageName(uploadedImageName));
+        assertThrows(IllegalArgumentException.class, () -> ImageUtility.getOriginalImageName(uploadedImageName));
     }
 
     @Test
     public void testGetOriginalImageNameThrowsIllegalArgumentExceptionWhenProvidedWithNull() {
         String uploadedImageName = null;
-        assertThrows(IllegalArgumentException.class, () -> ImageUploadUtility.getOriginalImageName(uploadedImageName));
+        assertThrows(IllegalArgumentException.class, () -> ImageUtility.getOriginalImageName(uploadedImageName));
     }
 
     @Test
     public void testGetGroupIdReturnsProperIdWhenProvidedWithProperStringPath() {
         String uploadPath = "/images/1/";
 
-        assertEquals(1L, ImageUploadUtility.getGroupId(uploadPath));
+        assertEquals(1L, ImageUtility.getGroupId(uploadPath));
     }
 
     //====================================================================================================
@@ -106,7 +105,7 @@ class ImageUploadServiceTest {
 
         File savedFile = new File(tempDir + "/1/" + image.fileName());
         assertTrue(savedFile.exists());
-        assertEquals(multipartFile.getName(), ImageUploadUtility.getOriginalImageName(image.fileName()));
+        assertEquals(multipartFile.getName(), ImageUtility.getOriginalImageName(image.fileName()));
         assertEquals(image.mimeType(), multipartFile.getContentType());
     }
 

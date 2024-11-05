@@ -18,7 +18,8 @@ public class FileServiceConfigImpl implements FileServiceConfig {
     private String uploadDirectory;
     @Value("${app.api.image-resource-uri}")
     private String imageResourceUri;
-
+    @Value("${app.api.root-uri}")
+    private String rootUri;
 
 
     @Override
@@ -30,7 +31,13 @@ public class FileServiceConfigImpl implements FileServiceConfig {
     public String getImageResourceUri() {
         return imageResourceUri;
     }
-//TODO lepiej ogarnac errora ioexcepion z try-catch
+
+    @Override
+    public String getRootUri() {
+        return rootUri;
+    }
+
+    //TODO lepiej ogarnac errora ioexcepion z try-catch
     @PostConstruct
     public void initializeUploadPath() throws IOException {
         Path path = Path.of(this.getUploadDirectory());

@@ -1,20 +1,13 @@
 package com.karatesan.ImageUploader.controller;
 
-import com.karatesan.ImageUploader.dto.response.ImageResponse;
-import com.karatesan.ImageUploader.dto.response.ImageResponseDtoLocation;
-import com.karatesan.ImageUploader.exception.MalformedFileException;
-import com.karatesan.ImageUploader.exception.UnsupportedDataTypeException;
+import com.karatesan.ImageUploader.dto.response.UploadedImagesResponseDto;
 import com.karatesan.ImageUploader.service.ImageDownloadService;
 import com.karatesan.ImageUploader.service.ImageUploadService;
-import com.karatesan.ImageUploader.utility.ImageUploadUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("upload")
@@ -26,22 +19,20 @@ public class ImageUploadController {
     @Autowired
     private ImageDownloadService imageDownloadService;
 
-//   public ImageResponse uploadImage(@RequestParam List<MultipartFile> images){
+    //   public ImageResponse uploadImage(@RequestParam List<MultipartFile> images){
     //TODOMa zwrocic link do resourca
     @PostMapping
-    public ResponseEntity<ImageResponse> uploadImage(@RequestParam("image") MultipartFile image){
+    public ResponseEntity<UploadedImagesResponseDto> uploadImages(@RequestParam("images") MultipartFile[] images, @RequestParam String groupId) {
+//testujemy to dla kazdego indywidualnego zdjecia w servisie
+//        Arrays.stream(images).forEach(image -> {
+//            if (!ImageUploadUtility.isImageValid(image))
+//                throw new MalformedFileException("Unsupported or malformed file.");
+//        });
 
-        if (!ImageUploadUtility.isImageValid(image))
-            throw new MalformedFileException("Unsupported or malformed file.");
-
-        try {
-            ImageResponseDtoLocation imageResponseDtoLocation = imageUploadService.saveImage(image);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(imageResponseDtoLocation);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        UploadedImagesResponseDto uploadedImagesResponseDto = imageUploadService.saveImages(images, groupId);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(uploadedImagesResponseDto);
     }
 
     //TODO exception dla zlego typu danych w requescie
